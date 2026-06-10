@@ -34,8 +34,9 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div className="min-h-screen text-foreground">
-      <div className="mx-auto max-w-[1500px] space-y-4 p-3 sm:p-5">
+    <div className="dark min-h-screen bg-background text-foreground">
+      <div className="dark-bg mx-auto max-w-[1500px] space-y-4 p-3 sm:p-5">
+
         <Header />
 
         {/* Stats row */}
