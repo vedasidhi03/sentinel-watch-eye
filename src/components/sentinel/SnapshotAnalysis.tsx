@@ -1,40 +1,23 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRef } from "react";
 import { Camera, Upload, AlertTriangle, Crosshair, ScanLine } from "lucide-react";
 import { Panel } from "./Panel";
 import { RiskBadge } from "./RiskBadge";
-import cctv1 from "@/assets/cctv.png.asset.json";
-import cctv2 from "@/assets/cctv-2.png.asset.json";
-import cctv3 from "@/assets/cctv-3.png.asset.json";
-import cctv4 from "@/assets/cctv-4.png.asset.json";
 import { useClock } from "@/hooks/use-sentinel";
-
-const DEFAULT_IMAGES = [cctv4.url, cctv3.url, cctv2.url, cctv1.url];
-
-const DETECT_LABELS = ["FOLLOWING DETECTED", "PATH MIRRORING", "PERSISTENT TRACKING"];
+import { useScenes } from "./SceneContext";
+import { riskColorVar, riskFromBai, riskTextClass } from "@/lib/sentinel";
 
 export function SnapshotAnalysis() {
-  const [images, setImages] = useState<string[]>(DEFAULT_IMAGES);
-  const [index, setIndex] = useState(0);
+  const { scenes, index, setIndex, active, addUploads } = useScenes();
   const fileRef = useRef<HTMLInputElement>(null);
   const now = useClock();
   const ts = now.toLocaleTimeString("en-GB", { hour12: false });
 
-  useEffect(() => {
-    if (images.length <= 1) return;
-    const id = setInterval(() => setIndex((i) => (i + 1) % images.length), 5000);
-    return () => clearInterval(id);
-  }, [images.length]);
-
   const onUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-    const urls = Array.from(files).map((f) => URL.createObjectURL(f));
-    setImages((prev) => [...urls, ...prev]);
-    setIndex(0);
+    if (e.target.files) addUploads(e.target.files);
   };
 
-  const current = images[index];
-  const camId = useMemo(() => `CAM-0${8 + (index % 2)}`, [index]);
+  const risk = riskFromBai(active.bai);
+  const baiColor = riskColorVar(risk);
 
   return (
     <Panel
@@ -62,8 +45,8 @@ export function SnapshotAnalysis() {
         {/* CCTV image */}
         <div className="relative aspect-video w-full overflow-hidden">
           <img
-            key={current}
-            src={current}
+            key={active.image}
+            src={active.image}
             alt="Surveillance snapshot under behavioral analysis"
             className="h-full w-full origin-center object-cover animate-kenburns"
           />
@@ -90,7 +73,7 @@ export function SnapshotAnalysis() {
             <polyline
               points="70,18 64,30 60,44 56,70"
               fill="none"
-              stroke="var(--risk-critical)"
+              stroke={baiColor}
               strokeWidth="0.5"
               strokeDasharray="2 1.5"
               opacity="0.9"
@@ -106,19 +89,22 @@ export function SnapshotAnalysis() {
             />
           </svg>
 
-          {/* Bounding box - Target */}
-          <BBox
-            style={{ left: "38%", top: "62%", width: "16%", height: "32%" }}
-            label="P-001 · TARGET"
-            color="var(--risk-safe)"
-          />
-          {/* Bounding box - Suspect */}
-          <BBox
-            style={{ left: "54%", top: "60%", width: "16%", height: "34%" }}
-            label="P-002 · SUSPECT"
-            color="var(--risk-critical)"
-            pulse
-          />
+          {/* Bounding boxes — the grid of persons for this frame */}
+          {active.boxes.map((b, i) => (
+            <BBox
+              key={`${active.id}-${i}`}
+              style={{ left: b.left, top: b.top, width: b.width, height: b.height }}
+              label={b.label}
+              color={
+                b.kind === "suspect"
+                  ? baiColor
+                  : b.kind === "target"
+                    ? "var(--risk-safe)"
+                    : "var(--muted-foreground)"
+              }
+              pulse={b.kind === "suspect"}
+            />
+          ))}
 
           {/* Top status bar */}
           <div className="absolute inset-x-0 top-0 flex items-center justify-between px-2.5 py-1.5 text-[10px] font-semibold tracking-wider">
@@ -127,10 +113,13 @@ export function SnapshotAnalysis() {
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-risk-critical" /> REC
               </span>
               <span className="flex items-center gap-1 rounded bg-black/55 px-1.5 py-0.5 text-foreground/90">
-                <Camera className="h-3 w-3" /> {camId}
+                <Camera className="h-3 w-3" /> {active.camId}
               </span>
             </div>
-            <span className="rounded bg-black/55 px-1.5 py-0.5 font-mono text-foreground/90">
+            <span
+              suppressHydrationWarning
+              className="rounded bg-black/55 px-1.5 py-0.5 font-mono text-foreground/90"
+            >
               {ts}
             </span>
           </div>
@@ -139,15 +128,25 @@ export function SnapshotAnalysis() {
           <div className="absolute bottom-2 left-2 flex items-center gap-1 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-primary">
             <ScanLine className="h-3 w-3 animate-pulse" /> AI ANALYSIS ACTIVE
           </div>
+
+          {/* Persons-in-frame chip */}
+          <div className="absolute bottom-2 right-2 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-foreground/90">
+            {active.personsTracked} PERSONS · {active.activePairs} PAIRS
+          </div>
         </div>
       </div>
 
       {/* Detection labels */}
       <div className="mt-3 flex flex-wrap gap-2">
-        {DETECT_LABELS.map((l) => (
+        {active.detection.map((l) => (
           <span
             key={l}
-            className="inline-flex items-center gap-1 rounded-md bg-risk-critical/12 px-2 py-1 text-[10px] font-bold tracking-wider text-risk-critical ring-1 ring-risk-critical/30"
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-bold tracking-wider ring-1"
+            style={{
+              color: baiColor,
+              backgroundColor: `color-mix(in oklab, ${baiColor} 12%, transparent)`,
+              boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${baiColor} 30%, transparent)`,
+            }}
           >
             <AlertTriangle className="h-3 w-3" /> {l}
           </span>
@@ -158,25 +157,29 @@ export function SnapshotAnalysis() {
       <div className="mt-3 flex items-center justify-between rounded-lg border border-border/70 bg-background/30 px-4 py-3">
         <div>
           <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
-            Behavioral Attention Index
+            Behavioral Attention Index · {active.pairLabel}
           </div>
-          <div className="font-mono text-3xl font-bold text-risk-critical text-glow">94</div>
+          <div className={`font-mono text-3xl font-bold text-glow ${riskTextClass(risk)}`}>
+            {active.bai}
+          </div>
         </div>
         <div className="text-right">
           <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
             Risk Level
           </div>
           <div className="mt-1">
-            <RiskBadge level="CRITICAL" pulse />
+            <RiskBadge level={risk} pulse={risk === "CRITICAL" || risk === "HIGH"} />
           </div>
         </div>
       </div>
 
       {/* feed dots */}
       <div className="mt-3 flex items-center justify-center gap-1.5">
-        {images.map((_, i) => (
-          <span
+        {scenes.map((_, i) => (
+          <button
             key={i}
+            aria-label={`View snapshot ${i + 1}`}
+            onClick={() => setIndex(i)}
             className={`h-1.5 rounded-full transition-all ${
               i === index ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/40"
             }`}
