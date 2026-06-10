@@ -11,6 +11,8 @@ import { AlertHistory } from "@/components/sentinel/AlertHistory";
 import { BaiTrendChart } from "@/components/sentinel/BaiTrendChart";
 import { SystemStatus } from "@/components/sentinel/SystemStatus";
 import { EthicalPanel } from "@/components/sentinel/EthicalPanel";
+import { SceneProvider, useScenes } from "@/components/sentinel/SceneContext";
+import { riskFromBai } from "@/lib/sentinel";
 
 export const Route = createFileRoute("/")({
   head: () => ({
