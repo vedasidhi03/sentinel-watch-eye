@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { useAnimatedCounter } from "@/hooks/use-sentinel";
 import { RiskBadge } from "./RiskBadge";
-import type { RiskLevel } from "@/lib/sentinel";
+import { riskColorVar, type RiskLevel } from "@/lib/sentinel";
 
 interface StatCardProps {
   label: string;
