@@ -11,6 +11,8 @@ import { AlertHistory } from "@/components/sentinel/AlertHistory";
 import { BaiTrendChart } from "@/components/sentinel/BaiTrendChart";
 import { SystemStatus } from "@/components/sentinel/SystemStatus";
 import { EthicalPanel } from "@/components/sentinel/EthicalPanel";
+import { SceneProvider, useScenes } from "@/components/sentinel/SceneContext";
+import { riskFromBai } from "@/lib/sentinel";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,34 +36,46 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
+    <SceneProvider>
+      <Dashboard />
+    </SceneProvider>
+  );
+}
+
+function Dashboard() {
+  const { active, maxBai, alertLevel } = useScenes();
+  const maxBaiCritical = riskFromBai(maxBai) === "CRITICAL";
+
+  return (
     <div className="dark min-h-screen bg-background text-foreground">
       <div className="dark-bg mx-auto max-w-[1500px] space-y-4 p-3 sm:p-5">
 
         <Header />
 
-        {/* Stats row */}
+        {/* Stats row — values track the active surveillance frame */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
             label="Persons Tracked"
-            value={12}
-            description="Currently monitored individuals"
+            value={active.personsTracked}
+            description="Individuals detected in frame"
             icon={<Eye className="h-4 w-4" />}
           />
           <StatCard
             label="Active Pairs"
-            value={5}
+            value={active.activePairs}
             description="Pairs under behavioral analysis"
             icon={<Link2 className="h-4 w-4" />}
           />
           <StatCard
             label="Maximum BAI"
-            value={94}
+            value={maxBai}
             description="Highest Behavioral Attention Index"
             icon={<Activity className="h-4 w-4" />}
-            accent="critical"
+            accent={maxBaiCritical ? "critical" : "default"}
           />
-          <AlertLevelCard level="CRITICAL" />
+          <AlertLevelCard level={alertLevel} />
         </div>
+
 
         {/* Main two-column */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
