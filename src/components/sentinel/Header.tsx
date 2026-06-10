@@ -37,10 +37,15 @@ export function Header() {
             </span>
           </div>
           <div className="text-right">
-            <div className="font-mono text-base font-semibold tabular-nums text-foreground sm:text-lg">
+            <div
+              suppressHydrationWarning
+              className="font-mono text-base font-semibold tabular-nums text-foreground sm:text-lg"
+            >
               {time}
             </div>
-            <div className="text-[11px] text-muted-foreground">{date}</div>
+            <div suppressHydrationWarning className="text-[11px] text-muted-foreground">
+              {date}
+            </div>
           </div>
         </div>
       </div>
