@@ -44,18 +44,34 @@ export function StatCard({ label, value, description, icon, accent = "default" }
 }
 
 export function AlertLevelCard({ level }: { level: RiskLevel }) {
+  const color = riskColorVar(level);
+  const isCritical = level === "CRITICAL";
   return (
-    <div className="glass group relative overflow-hidden rounded-xl p-4 glow-critical">
+    <div
+      className={cn(
+        "glass group relative overflow-hidden rounded-xl p-4",
+        isCritical && "glow-critical",
+      )}
+    >
       <div className="flex items-start justify-between">
         <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           Current Alert Level
         </span>
         <span className="relative flex h-3 w-3">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-risk-critical opacity-75" />
-          <span className="relative inline-flex h-3 w-3 rounded-full bg-risk-critical" />
+          <span
+            className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+            style={{ backgroundColor: color }}
+          />
+          <span
+            className="relative inline-flex h-3 w-3 rounded-full"
+            style={{ backgroundColor: color }}
+          />
         </span>
       </div>
-      <div className="mt-3 text-3xl font-extrabold tracking-tight text-risk-critical text-glow">
+      <div
+        className="mt-3 text-3xl font-extrabold tracking-tight text-glow"
+        style={{ color }}
+      >
         {level}
       </div>
       <div className="mt-2">
