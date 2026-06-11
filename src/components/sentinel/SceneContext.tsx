@@ -36,13 +36,9 @@ export interface Scene {
   pairLabel: string;
 }
 
-/** A flagged target/suspect pair plus a varying number of bystander boxes. */
-function withCrowd(
-  target: SceneBox,
-  suspect: SceneBox,
-  bystanders: SceneBox[],
-): SceneBox[] {
-  return [target, suspect, ...bystanders];
+/** Only the two tracked individuals: P-001 (target) and P-002 (suspect). */
+function pair(target: SceneBox, suspect: SceneBox): SceneBox[] {
+  return [target, suspect];
 }
 
 const BASE_SCENES: Scene[] = [
@@ -50,71 +46,56 @@ const BASE_SCENES: Scene[] = [
     id: "s1",
     image: cctv4.url,
     camId: "CAM-08",
-    personsTracked: 12,
-    activePairs: 5,
+    personsTracked: 2,
+    activePairs: 1,
     bai: 94,
     pairLabel: "P-001 · P-002",
     detection: ["FOLLOWING DETECTED", "PATH MIRRORING", "PERSISTENT TRACKING"],
-    boxes: withCrowd(
+    boxes: pair(
       { left: "38%", top: "62%", width: "16%", height: "32%", label: "P-001 · TARGET", kind: "target" },
       { left: "54%", top: "60%", width: "16%", height: "34%", label: "P-002 · SUSPECT", kind: "suspect" },
-      [
-        { left: "10%", top: "30%", width: "9%", height: "20%", label: "P-003", kind: "normal" },
-        { left: "78%", top: "34%", width: "10%", height: "22%", label: "P-004", kind: "normal" },
-        { left: "24%", top: "22%", width: "8%", height: "16%", label: "P-005", kind: "normal" },
-      ],
     ),
   },
   {
     id: "s2",
     image: cctv3.url,
     camId: "CAM-09",
-    personsTracked: 9,
-    activePairs: 4,
+    personsTracked: 2,
+    activePairs: 1,
     bai: 78,
-    pairLabel: "P-004 · P-005",
-    detection: ["PATH MIRRORING", "REPEATED PRESENCE"],
-    boxes: withCrowd(
-      { left: "30%", top: "56%", width: "16%", height: "34%", label: "P-004 · TARGET", kind: "target" },
-      { left: "48%", top: "54%", width: "16%", height: "36%", label: "P-005 · SUSPECT", kind: "suspect" },
-      [
-        { left: "72%", top: "40%", width: "10%", height: "24%", label: "P-006", kind: "normal" },
-        { left: "14%", top: "34%", width: "9%", height: "20%", label: "P-007", kind: "normal" },
-      ],
+    pairLabel: "P-001 · P-002",
+    detection: ["PATH MIRRORING", "PERSISTENT TRACKING"],
+    boxes: pair(
+      { left: "30%", top: "56%", width: "16%", height: "34%", label: "P-001 · TARGET", kind: "target" },
+      { left: "48%", top: "54%", width: "16%", height: "36%", label: "P-002 · SUSPECT", kind: "suspect" },
     ),
   },
   {
     id: "s3",
     image: cctv2.url,
     camId: "CAM-08",
-    personsTracked: 7,
-    activePairs: 3,
+    personsTracked: 2,
+    activePairs: 1,
     bai: 58,
-    pairLabel: "P-006 · P-007",
-    detection: ["PROXIMITY WATCH", "REPEATED PRESENCE"],
-    boxes: withCrowd(
-      { left: "40%", top: "58%", width: "15%", height: "32%", label: "P-006 · TARGET", kind: "target" },
-      { left: "20%", top: "50%", width: "15%", height: "36%", label: "P-007 · WATCH", kind: "suspect" },
-      [
-        { left: "70%", top: "42%", width: "10%", height: "22%", label: "P-008", kind: "normal" },
-      ],
+    pairLabel: "P-001 · P-002",
+    detection: ["PROXIMITY WATCH", "PATH MIRRORING"],
+    boxes: pair(
+      { left: "40%", top: "58%", width: "15%", height: "32%", label: "P-001 · TARGET", kind: "target" },
+      { left: "20%", top: "50%", width: "15%", height: "36%", label: "P-002 · SUSPECT", kind: "suspect" },
     ),
   },
   {
     id: "s4",
     image: cctv1.url,
     camId: "CAM-09",
-    personsTracked: 5,
-    activePairs: 2,
+    personsTracked: 2,
+    activePairs: 1,
     bai: 34,
-    pairLabel: "P-008 · P-009",
+    pairLabel: "P-001 · P-002",
     detection: ["NOMINAL MOVEMENT"],
-    boxes: withCrowd(
-      { left: "44%", top: "58%", width: "15%", height: "32%", label: "P-008", kind: "target" },
-      { left: "26%", top: "52%", width: "14%", height: "34%", label: "P-009", kind: "normal" },
-      [
-        { left: "70%", top: "44%", width: "10%", height: "22%", label: "P-010", kind: "normal" },
-      ],
+    boxes: pair(
+      { left: "44%", top: "58%", width: "15%", height: "32%", label: "P-001 · TARGET", kind: "target" },
+      { left: "26%", top: "52%", width: "14%", height: "34%", label: "P-002 · SUSPECT", kind: bai >= 41 ? "suspect" : "normal" },
     ),
   },
 ];
