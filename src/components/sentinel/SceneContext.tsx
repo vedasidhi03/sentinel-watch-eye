@@ -110,8 +110,8 @@ function hashString(s: string): number {
 function sceneFromUpload(url: string, name: string, idx: number): Scene {
   const seed = hashString(name + idx);
   const bai = 28 + (seed % 72); // 28..99
-  const personsTracked = 4 + (seed % 12); // 4..15
-  const activePairs = 1 + (seed % 6); // 1..6
+  const personsTracked = 2; // only P-001 and P-002 are tracked
+  const activePairs = 1; // the single flagged pair
   const labels = ["FOLLOWING DETECTED", "PATH MIRRORING", "PERSISTENT TRACKING", "REPEATED PRESENCE"];
   const detection =
     bai >= 71
@@ -128,13 +128,9 @@ function sceneFromUpload(url: string, name: string, idx: number): Scene {
     bai,
     pairLabel: "P-001 · P-002",
     detection,
-    boxes: withCrowd(
+    boxes: pair(
       { left: "38%", top: "60%", width: "16%", height: "32%", label: "P-001 · TARGET", kind: "target" },
-      { left: "54%", top: "58%", width: "16%", height: "34%", label: "P-002 · SUSPECT", kind: bai >= 41 ? "suspect" : "normal" },
-      [
-        { left: `${12 + (seed % 10)}%`, top: "32%", width: "9%", height: "20%", label: "P-003", kind: "normal" },
-        { left: `${70 + (seed % 8)}%`, top: "36%", width: "10%", height: "22%", label: "P-004", kind: "normal" },
-      ],
+      { left: "54%", top: "58%", width: "16%", height: "34%", label: "P-002 · SUSPECT", kind: "suspect" },
     ),
   };
 }
