@@ -77,14 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "SentinelHer" },
+      { name: "description", content: "Sentinel Watch analyzes surveillance video to identify and highlight suspicious following behavior." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "SentinelHer" },
+      { property: "og:description", content: "Sentinel Watch analyzes surveillance video to identify and highlight suspicious following behavior." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "SentinelHer" },
+      { name: "twitter:description", content: "Sentinel Watch analyzes surveillance video to identify and highlight suspicious following behavior." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/df8424de-a47a-43bd-b859-d5335b2acb99/id-preview-8b2ff56f--d1679ab5-805a-4d2e-9d67-0f7d4cb49e74.lovable.app-1781150221062.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/df8424de-a47a-43bd-b859-d5335b2acb99/id-preview-8b2ff56f--d1679ab5-805a-4d2e-9d67-0f7d4cb49e74.lovable.app-1781150221062.png" },
     ],
     links: [
       {
