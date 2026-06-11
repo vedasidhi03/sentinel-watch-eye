@@ -95,7 +95,7 @@ const BASE_SCENES: Scene[] = [
     detection: ["NOMINAL MOVEMENT"],
     boxes: pair(
       { left: "44%", top: "58%", width: "15%", height: "32%", label: "P-001 · TARGET", kind: "target" },
-      { left: "26%", top: "52%", width: "14%", height: "34%", label: "P-002 · SUSPECT", kind: bai >= 41 ? "suspect" : "normal" },
+      { left: "26%", top: "52%", width: "14%", height: "34%", label: "P-002 · SUSPECT", kind: "suspect" },
     ),
   },
 ];
